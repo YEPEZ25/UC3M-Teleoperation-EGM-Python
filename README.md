@@ -62,7 +62,7 @@ ENDPROC
 
 ---
 
-## 2️⃣ Python Code – `teleoperation.py`
+## 2️⃣ Python Code – `egm_stream_guidance_main.py`
 
 This Python script connects to the robot via UDP, sends Cartesian target poses, and monitors feedback.
 
@@ -92,7 +92,7 @@ if not first_position_sent and current_target == 0:
 3. Launch the Python script:
 
 ```bash
-python teleoperation.py
+python egm_stream_guidance_main.py
 ```
 
 4. The robot will start moving through the defined sequence of targets.
