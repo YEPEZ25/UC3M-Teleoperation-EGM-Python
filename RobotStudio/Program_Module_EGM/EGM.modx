@@ -1,0 +1,74 @@
+MODULE EGM
+  PERS egm_minmax egmTol := [-1.0, 1.0];
+  !PERS tooldata myTool := [TRUE, [[0,0,500],[1,0,0,0]], [1,[0,0,100],[1,0,0,0],0,0,0]];
+  ! The work object. Base Frame
+    LOCAL PERS wobjdata egm_wobj := [FALSE, TRUE, "", 
+                                    [[0.0, 0.0, 0.0],[1.0, 0.0, 0.0, 0.0]], 
+                                    [[0.0, 0.0, 0.0],[1.0, 0.0, 0.0, 0.0]]]; 
+  VAR egmident egmID;
+  VAR bool keepRunning := TRUE;
+  VAR jointtarget pHome;
+
+  PROC main()
+
+    ! Obtener ID única para esta sesión EGM
+    EGMGetId egmID;
+
+    ! Configurar el canal de comunicación UDP (EGMDevice debe estar configurado en I/O)
+    EGMSetupUC ROB_1, egmID, "default", "EGMDevice" \Pose \CommTimeout:=10000;
+
+    ! Activar Stream + Guidance
+    EGMActPose egmID 
+            \StreamStart 
+            \Tool:=tool0 
+            \Wobj:=egm_wobj,
+            [[0,0,0],[1,0,0,0]], 
+            EGM_FRAME_WORLD,  
+            [[0,0,0],[1,0,0,0]], 
+            EGM_FRAME_WORLD,
+            \x:=egmTol 
+            \y:=egmTol 
+            \z:=egmTol 
+            \rx:=egmTol 
+            \ry:=egmTol 
+            \rz:=egmTol,
+            \LpFilter:=20 
+            \SampleRate:=4
+            \MaxPosDeviation := 1000
+            \MaxSpeedDeviation := 50;
+            
+    FOR i FROM 1 TO 6 DO
+        MoveSecurityPosition i;
+    ENDFOR
+
+    ! Bucle para aceptar nuevas posiciones
+    WHILE keepRunning DO
+      EGMRunPose egmID, EGM_STOP_HOLD \x \y \z \rx \ry \rz;
+      WaitTime 0.01;  ! Pequeño delay para evitar saturar
+    ENDWHILE
+
+    ! Apagar EGM
+    EGMStreamStop egmID;
+    EGMReset egmID;
+
+  ENDPROC
+  
+  PROC MoveSecurityPosition(num i)
+      pHome := CJointT();
+      IF i=1 THEN
+          pHome.robax.rax_1 := 0;
+      ELSEIF i=2 THEN
+          pHome.robax.rax_2 := 0;
+      ELSEIF i=3 THEN
+          pHome.robax.rax_3 := 0;
+      ELSEIF i=4 THEN
+          pHome.robax.rax_4 := 0;
+      ELSEIF i=5 THEN
+          pHome.robax.rax_5 := 90;  
+      ELSEIF i=6 THEN
+          pHome.robax.rax_6 := 90;
+      ENDIF
+      MoveAbsJ pHome, v100, fine, tool0;
+  ENDPROC
+
+ENDMODULE
