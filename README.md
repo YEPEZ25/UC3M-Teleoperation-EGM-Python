@@ -25,7 +25,7 @@ pip install protobuf numpy
 
 ### 📁 Required Files
 - `egm_pb2.py`: generated from ABB's official `.proto` EGM file
-- `teleoperation.py`: main Python script to send Cartesian targets
+- `egm_stream_guidance_main.py`: main Python script to send Cartesian targets
 - `EGM.mod`: RAPID module that starts and manages EGM on the robot
 
 ---
