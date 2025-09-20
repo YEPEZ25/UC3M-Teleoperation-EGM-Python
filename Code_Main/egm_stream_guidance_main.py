@@ -19,7 +19,7 @@ targets = [
 ]
 
 # Posición segura de las articulaciones [J1, J2, J3, J4, J5, J6]
-safe_joint_position = [0, 0, 0, 0, 90, 90]
+safe_joint_position = [0, 0, 0, 0, 90, 0]
 
 """
 def euler_deg_to_quaternion(rx, ry, rz):
@@ -127,7 +127,7 @@ while current_target < len(targets):
 
         # Verificar si se alcanzó la posición
         if pose_close(actual_pose[:3], target[:3]):
-            print(f"✔ Objetivo #{current_target + 1} alcanzado: {actual_pose[:3]}")
+            print(f"✔ Objetivo #{current_target + 1} alcanzado: {actual_pose[:7]}")
             current_target += 1
             time.sleep(0.5)  # pequeña pausa antes del siguiente target
 
